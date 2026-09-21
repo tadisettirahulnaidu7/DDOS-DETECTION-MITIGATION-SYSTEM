@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="app.diagrams.net" modified="2026-08-31T09:55:00.000Z" agent="ChatGPT" version="24.7.17" type="device">
+  <diagram id="simple-ddos-architecture" name="DDoS Detection and Mitigation - Simple Architecture">
+    <mxGraphModel dx="1400" dy="850" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1400" pageHeight="850" math="0" shadow="0">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+
+        <!-- Title -->
+        <mxCell id="title" value="CYBER-14 — DDoS Detection and Mitigation System Architecture"
+          style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=22;fontStyle=1;"
+          vertex="1" parent="1">
+          <mxGeometry x="300" y="30" width="800" height="45" as="geometry"/>
+        </mxCell>
+
+        <!-- Main flow boxes -->
+        <mxCell id="input" value="1. INPUT&#xa;&lt;b&gt;CIC-DDoS2019&lt;/b&gt;&#xa;Traffic data &amp; authorised fixtures&#xa;Validate schema and provenance"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;strokeWidth=2;fontSize=14;spacing=8;"
+          vertex="1" parent="1">
+          <mxGeometry x="50" y="180" width="190" height="125" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="preprocess" value="2. TRAFFIC PROCESSING&#xa;&lt;b&gt;Feature Extraction&lt;/b&gt;&#xa;Clean and validate traffic data&#xa;Prepare features for detection"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;strokeWidth=2;fontSize=14;spacing=8;"
+          vertex="1" parent="1">
+          <mxGeometry x="280" y="180" width="190" height="125" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="detect" value="3. DDoS DETECTION&#xa;&lt;b&gt;ML / Reference Detector&lt;/b&gt;&#xa;Normal traffic vs DDoS&#xa;Distinguish flash crowds"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;strokeWidth=2;fontSize=14;spacing=8;"
+          vertex="1" parent="1">
+          <mxGeometry x="510" y="180" width="200" height="125" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="classify" value="4. ATTACK CLASSIFICATION&#xa;&lt;b&gt;ML Classifier&lt;/b&gt;&#xa;Identify attack type&#xa;Generate detection result"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;strokeWidth=2;fontSize=14;spacing=8;"
+          vertex="1" parent="1">
+          <mxGeometry x="750" y="180" width="190" height="125" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="mitigate" value="5. MITIGATION&#xa;&lt;b&gt;Rate-Limit Response&lt;/b&gt;&#xa;Contain malicious traffic&#xa;Fail-safe / degraded response"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;strokeWidth=2;fontSize=14;spacing=8;"
+          vertex="1" parent="1">
+          <mxGeometry x="980" y="180" width="190" height="125" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="target" value="6. PROTECTED SERVICE&#xa;&lt;b&gt;Authorised Test Target&lt;/b&gt;&#xa;Protected from excessive traffic&#xa;Measure system response"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;strokeWidth=2;fontSize=14;spacing=8;"
+          vertex="1" parent="1">
+          <mxGeometry x="1210" y="180" width="150" height="125" as="geometry"/>
+        </mxCell>
+
+        <!-- Main arrows -->
+        <mxCell id="a1" value="traffic"
+          style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;strokeWidth=2;"
+          edge="1" parent="1" source="input" target="preprocess">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="a2" value="features"
+          style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;strokeWidth=2;"
+          edge="1" parent="1" source="preprocess" target="detect">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="a3" value="detection result"
+          style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;strokeWidth=2;"
+          edge="1" parent="1" source="detect" target="classify">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="a4" value="attack type"
+          style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;strokeWidth=2;"
+          edge="1" parent="1" source="classify" target="mitigate">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="a5" value="rate limit"
+          style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;strokeWidth=2;"
+          edge="1" parent="1" source="mitigate" target="target">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- Streaming pipeline label -->
+        <mxCell id="streamLabel" value="STREAMING PIPELINE — continuous traffic processing"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;strokeWidth=1;fontSize=13;fontStyle=1;"
+          vertex="1" parent="1">
+          <mxGeometry x="430" y="105" width="500" height="45" as="geometry"/>
+        </mxCell>
+
+        <!-- Supporting components -->
+        <mxCell id="dashboard" value="OPERATOR DASHBOARD&#xa;• Detection status&#xa;• Attack type&#xa;• Mitigation status&#xa;• Health &amp; latency"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;strokeWidth=2;fontSize=14;spacing=8;"
+          vertex="1" parent="1">
+          <mxGeometry x="220" y="430" width="270" height="135" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="evidence" value="EVIDENCE &amp; LOGGING&#xa;• Configurations&#xa;• Logs &amp; measurements&#xa;• Test results&#xa;• Recovery evidence"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;strokeWidth=2;fontSize=14;spacing=8;"
+          vertex="1" parent="1">
+          <mxGeometry x="565" y="430" width="270" height="135" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="testing" value="VALIDATION &amp; SECURITY TESTING&#xa;• Flash-crowd false positives&#xa;• Attack-type diversity&#xa;• Speed vs accuracy&#xa;• Trust-boundary &amp; recovery tests"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;strokeWidth=2;fontSize=14;spacing=8;"
+          vertex="1" parent="1">
+          <mxGeometry x="910" y="430" width="270" height="135" as="geometry"/>
+        </mxCell>
+
+        <!-- Supporting arrows -->
+        <mxCell id="s1" value="status / alerts"
+          style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;dashed=1;strokeWidth=2;"
+          edge="1" parent="1" source="classify" target="dashboard">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="s2" value="metrics / logs"
+          style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;dashed=1;strokeWidth=2;"
+          edge="1" parent="1" source="mitigate" target="evidence">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="s3" value="test fixtures"
+          style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;dashed=1;strokeWidth=2;"
+          edge="1" parent="1" source="testing" target="detect">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="s4" value="test evidence"
+          style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;dashed=1;strokeWidth=2;"
+          edge="1" parent="1" source="testing" target="evidence">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- Security note -->
+        <mxCell id="security" value="SECURITY PRINCIPLES: Least privilege • Secret protection • Trust boundaries • Fail-secure behaviour • Degraded mode • Verified recovery"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;strokeWidth=2;fontSize=13;fontStyle=1;spacing=8;"
+          vertex="1" parent="1">
+          <mxGeometry x="220" y="635" width="960" height="60" as="geometry"/>
+        </mxCell>
+
+        <!-- KPI note -->
+        <mxCell id="kpi" value="FINAL EVALUATION: Detection Accuracy • Flash-Crowd False Positives • Detection Latency • Unsafe/Unauthorised Outcomes • Attack-Path Detection/Prevention • False-Positive Rate"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;strokeWidth=2;fontSize=13;fontStyle=1;spacing=8;"
+          vertex="1" parent="1">
+          <mxGeometry x="220" y="720" width="960" height="60" as="geometry"/>
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
