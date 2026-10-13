@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>CYBER-14 | DDoS Detection &amp; Mitigation</title>
+<style>
+  :root{
+    --void:#070B14; --panel:#0E1626; --panel2:#131E33; --line:#1E2C46;
+    --cyan:#22D3EE; --ember:#FB7185; --amber:#FBBF24; --mint:#34D399;
+    --ink:#DCE6F5; --faint:#5B6B8C;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; background:var(--void); color:var(--ink);
+    font-family:-apple-system,Segoe UI,Roboto,Inter,sans-serif;
+  }
+  .mono{font-family:'Courier New',monospace;}
+  .hidden{display:none !important;}
+
+  /* ---- Login ---- */
+  #login{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;}
+  .login-box{width:100%;max-width:340px;}
+  .logo{width:56px;height:56px;border-radius:12px;background:rgba(34,211,238,.1);border:1px solid rgba(34,211,238,.3);
+    display:flex;align-items:center;justify-content:center;font-size:26px;margin:0 auto 14px;}
+  .login-box h1{font-size:17px;text-align:center;margin:0 0 4px;}
+  .login-box p.sub{text-align:center;color:var(--cyan);font-size:11px;letter-spacing:.06em;margin:0 0 22px;}
+  .card{background:linear-gradient(180deg,#0E1626,#0B121F);border:1px solid var(--line);border-radius:10px;}
+  .login-box form{padding:22px;}
+  .field{margin-bottom:14px;}
+  .field label{display:block;font-size:11px;text-transform:uppercase;color:var(--faint);margin-bottom:6px;letter-spacing:.04em;}
+  .field input{width:100%;padding:10px 12px;background:var(--panel2);border:1px solid var(--line);border-radius:6px;color:var(--ink);font-size:14px;}
+  .field input:focus{outline:none;border-color:var(--cyan);}
+  .btn{width:100%;padding:11px;border:none;border-radius:6px;font-weight:600;font-size:14px;cursor:pointer;}
+  .btn-primary{background:var(--cyan);color:var(--void);}
+  .btn-primary:hover{opacity:.9;}
+  .btn-danger{background:var(--ember);color:var(--void);}
+  .btn-danger:disabled{background:var(--panel2);color:var(--faint);cursor:not-allowed;}
+  .hint{background:none;border:none;color:var(--faint);font-size:12px;width:100%;margin-top:10px;cursor:pointer;}
+  .hint:hover{color:var(--cyan);}
+  .err{color:var(--ember);font-size:12px;margin:-4px 0 10px;}
+  .foot-note{text-align:center;color:var(--faint);font-size:11px;margin-top:16px;opacity:.7;}
+
+  /* ---- Dashboard ---- */
+  #dashboard{padding:24px;max-width:1200px;margin:0 auto;}
+  .topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:22px;flex-wrap:wrap;gap:10px;}
+  .topbar h2{margin:0;font-size:19px;}
+  .topbar .sub{color:var(--faint);font-size:12px;margin-top:2px;}
+  .status-pill{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:999px;font-size:11px;font-weight:700;font-family:'Courier New',monospace;}
+  .status-pill.ok{color:var(--mint);border:1px solid rgba(52,211,153,.3);background:rgba(52,211,153,.1);}
+  .status-pill.bad{color:var(--ember);border:1px solid rgba(251,113,133,.4);background:rgba(251,113,133,.1);}
+  .dot{width:7px;height:7px;border-radius:50%;background:currentColor;}
+  #logoutBtn{background:none;border:1px solid var(--line);color:var(--faint);padding:7px 12px;border-radius:6px;font-size:12px;cursor:pointer;}
+  #logoutBtn:hover{color:var(--ember);border-color:rgba(251,113,133,.4);}
+
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:20px;}
+  .stat{padding:16px;}
+  .stat .label{font-size:11px;text-transform:uppercase;color:var(--faint);letter-spacing:.04em;margin-bottom:8px;}
+  .stat .value{font-family:'Courier New',monospace;font-size:22px;font-weight:700;}
+  .stat .value .unit{font-size:12px;color:var(--faint);font-weight:400;margin-left:3px;}
+
+  .main-grid{display:grid;grid-template-columns:2fr 1fr;gap:14px;}
+  @media (max-width:820px){.main-grid{grid-template-columns:1fr;}}
+  .panel{padding:18px;}
+  .panel h3{margin:0 0 3px;font-size:14px;}
+  .panel .desc{color:var(--faint);font-size:11px;margin-bottom:14px;}
+
+  svg{display:block;width:100%;height:220px;}
+  #simulateBtn{display:flex;align-items:center;justify-content:center;gap:8px;}
+
+  .flow-idle{text-align:center;padding:30px 10px;color:var(--faint);}
+  .flow-idle .big{font-size:26px;margin-bottom:8px;}
+  .flow-idle .t1{color:var(--ink);font-weight:600;font-size:14px;margin-bottom:4px;}
+  .warn-box{text-align:center;padding:30px 10px;color:var(--ember);font-weight:700;font-size:14px;}
+  .attack-meta{border:1px solid rgba(251,113,133,.3);background:rgba(251,113,133,.06);border-radius:8px;padding:12px;font-size:12px;}
+  .attack-meta .t{color:var(--ember);font-weight:700;font-family:'Courier New',monospace;margin-bottom:8px;}
+  .attack-meta .row{display:flex;justify-content:space-between;color:var(--faint);font-family:'Courier New',monospace;padding:2px 0;}
+  .attack-meta .row span:last-child{color:var(--ink);}
+  .classified{color:var(--amber);font-family:'Courier New',monospace;margin-top:8px;font-size:12px;}
+  .steps{margin-top:12px;}
+  .step{display:flex;align-items:center;gap:8px;font-size:12px;font-family:'Courier New',monospace;color:var(--faint);padding:4px 0;}
+  .step.done{color:var(--mint);}
+  .step .mark{width:12px;height:12px;border-radius:50%;border:1px solid currentColor;display:flex;align-items:center;justify-content:center;font-size:9px;}
+
+  table{width:100%;border-collapse:collapse;font-size:12.5px;}
+  th{text-align:left;color:var(--faint);text-transform:uppercase;font-size:10.5px;letter-spacing:.04em;padding:9px 10px;border-bottom:1px solid var(--line);}
+  td{padding:9px 10px;border-bottom:1px solid rgba(30,44,70,.5);font-family:'Courier New',monospace;}
+  .badge{display:inline-block;padding:3px 9px;border-radius:999px;font-size:10.5px;font-weight:600;font-family:'Courier New',monospace;}
+  .b-critical{color:var(--ember);background:rgba(251,113,133,.1);border:1px solid rgba(251,113,133,.3);}
+  .b-mitigated{color:var(--mint);background:rgba(52,211,153,.1);border:1px solid rgba(52,211,153,.3);}
+  .b-active{color:var(--ember);background:rgba(251,113,133,.1);border:1px solid rgba(251,113,133,.3);}
+  .b-low{color:var(--faint);background:var(--panel2);border:1px solid var(--line);}
+
+  .table-panel{margin-top:14px;}
+  .note{color:var(--faint);font-size:10.5px;margin-top:14px;text-align:center;}
+</style>
+</head>
+<body>
+
+<!-- ===== LOGIN ===== -->
+<div id="login">
+  <div class="login-box">
+    <div class="logo">🛡️</div>
+    <h1>DDoS Detection and Mitigation</h1>
+    <p class="sub">CYBER-14 &middot; SECURITY PROTOTYPE</p>
+    <div class="card">
+      <form id="loginForm">
+        <div class="field">
+          <label>Username</label>
+          <input id="username" type="text" placeholder="admin" autocomplete="username" />
+        </div>
+        <div class="field">
+          <label>Password</label>
+          <input id="password" type="password" placeholder="••••••••" autocomplete="current-password" />
+        </div>
+        <p class="err hidden" id="loginErr">Invalid credentials. Use the demo login below.</p>
+        <button type="submit" class="btn btn-primary">Login →</button>
+        <button type="button" class="hint" id="fillDemo">Use demo credentials: <b style="color:var(--cyan)">admin / admin123</b></button>
+      </form>
+    </div>
+    <p class="foot-note">Frontend-only simulation. No real network data is used.</p>
+  </div>
+</div>
+
+<!-- ===== DASHBOARD ===== -->
+<div id="dashboard" class="hidden">
+  <div class="topbar">
+    <div>
+      <h2>Security Operations Dashboard</h2>
+      <p class="sub">CYBER-14 &middot; DEMO / SIMULATION DATA</p>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;">
+      <span id="statusPill" class="status-pill ok"><span class="dot"></span>PROTECTED</span>
+      <button id="logoutBtn">Logout</button>
+    </div>
+  </div>
+
+  <div class="grid">
+    <div class="card stat"><div class="label">Network Traffic</div><div class="value" id="statTraffic">—<span class="unit">Mbps</span></div></div>
+    <div class="card stat"><div class="label">Packets / sec</div><div class="value" id="statPps">—</div></div>
+    <div class="card stat"><div class="label">Active Connections</div><div class="value" id="statConn">—</div></div>
+    <div class="card stat"><div class="label">Detected Attacks</div><div class="value" id="statDetected" style="color:var(--amber)">—</div></div>
+    <div class="card stat"><div class="label">Mitigated Attacks</div><div class="value" id="statMitigated" style="color:var(--mint)">—</div></div>
+    <div class="card stat"><div class="label">Suspicious IPs</div><div class="value" id="statSuspicious" style="color:var(--ember)">—</div></div>
+  </div>
+
+  <div class="main-grid">
+    <div class="card panel">
+      <h3>Real-Time Traffic Simulation</h3>
+      <p class="desc">DEMO / SIMULATION DATA &middot; updates every 1.5s</p>
+      <svg id="chart" viewBox="0 0 600 220" preserveAspectRatio="none"></svg>
+    </div>
+
+    <div class="card panel">
+      <h3>Attack Simulation</h3>
+      <p class="desc" style="margin-bottom:12px;">Runs entirely on mock frontend data</p>
+      <button id="simulateBtn" class="btn btn-danger">⚡ Simulate DDoS Attack</button>
+      <div id="flowArea" style="margin-top:14px;"></div>
+    </div>
+  </div>
+
+  <div class="card panel table-panel">
+    <h3>Recent Attack Log</h3>
+    <p class="desc">Simulated records &middot; fictional sample IP addresses</p>
+    <table>
+      <thead>
+        <tr><th>Time</th><th>Source IP</th><th>Protocol</th><th>Type</th><th>Severity</th><th>Status</th></tr>
+      </thead>
+      <tbody id="attackTableBody"></tbody>
+    </table>
+  </div>
+
+  <p class="note">Prototype for college project review &middot; frontend simulation only, no backend/database/API</p>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  // ---------- LOGIN ----------
+  var loginForm = document.getElementById('loginForm');
+  var loginErr = document.getElementById('loginErr');
+  document.getElementById('fillDemo').addEventListener('click', function(){
+    document.getElementById('username').value = 'admin';
+    document.getElementById('password').value = 'admin123';
+  });
+  loginForm.addEventListener('submit', function(e){
+    e.preventDefault();
+    var u = document.getElementById('username').value.trim();
+    var p = document.getElementById('password').value;
+    if(u === 'admin' && p === 'admin123'){
+      document.getElementById('login').classList.add('hidden');
+      document.getElementById('dashboard').classList.remove('hidden');
+      startApp();
+    } else {
+      loginErr.classList.remove('hidden');
+    }
+  });
+  document.getElementById('logoutBtn').addEventListener('click', function(){
+    document.getElementById('dashboard').classList.add('hidden');
+    document.getElementById('login').classList.remove('hidden');
+  });
+
+  // ---------- STATE ----------
+  var traffic = []; // {t, incoming, outgoing, pps}
+  var tCounter = 0;
+  var intensity = 0;
+  var phase = 'IDLE'; // IDLE, RAMPING, ABNORMAL, CLASSIFYING, ALERTING, MITIGATING, RECOVERING
+  var detected = 17, mitigated = 15, suspicious = 8;
+  var appStarted = false;
+
+  var attackTypes = ['SYN Flood','UDP Flood','ICMP Flood','HTTP Flood'];
+  var protocols = ['TCP','UDP','ICMP','HTTP'];
+  var attackLog = [];
+  for(var i=0;i<6;i++){
+    var type = attackTypes[i % attackTypes.length];
+    attackLog.push({
+      time: new Date(Date.now() - (i+1)*17*60000),
+      ip: '192.168.'+((i%4)+1)+'.'+(((i*13)%250)+1),
+      protocol: type==='SYN Flood'?'TCP':type==='UDP Flood'?'UDP':type==='ICMP Flood'?'ICMP':'HTTP',
+      type: type,
+      severity: i%3===0?'Critical':i%3===1?'High':'Low',
+      status: i%4===0?'Active':'Mitigated'
+    });
+  }
+
+  function fmtTime(d){
+    return d.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false});
+  }
+
+  // ---------- CHART ----------
+  var svg = document.getElementById('chart');
+  function renderChart(){
+    var w=600,h=220,pad=10;
+    var data = traffic.slice(-30);
+    if(data.length<2){ svg.innerHTML=''; return; }
+    var maxV = Math.max.apply(null, data.map(function(d){return d.incoming;})) * 1.2 || 100;
+    function pt(i,val){
+      var x = pad + (i/(data.length-1)) * (w-2*pad);
+      var y = h - pad - (val/maxV) * (h-2*pad);
+      return x+','+y;
+    }
+    var incomingPts = data.map(function(d,i){return pt(i,d.incoming);}).join(' ');
+    var outgoingPts = data.map(function(d,i){return pt(i,d.outgoing);}).join(' ');
+    var incomingArea = 'M'+pt(0,0).split(',')[0]+','+h+' L'+incomingPts+' L'+(w-pad)+','+h+' Z';
+
+    svg.innerHTML =
+      '<defs>' +
+        '<linearGradient id="g1" x1="0" y1="0" x2="0" y2="1">' +
+          '<stop offset="0%" stop-color="#22D3EE" stop-opacity="0.35"/>' +
+          '<stop offset="100%" stop-color="#22D3EE" stop-opacity="0"/>' +
+        '</linearGradient>' +
+      '</defs>' +
+      '<g>' +
+        [0,1,2,3].map(function(i){var y=pad+i*(h-2*pad)/3; return '<line x1="'+pad+'" y1="'+y+'" x2="'+(w-pad)+'" y2="'+y+'" stroke="#1E2C46" stroke-dasharray="3,3"/>';}).join('') +
+      '</g>' +
+      '<path d="'+incomingArea+'" fill="url(#g1)"/>' +
+      '<polyline points="'+incomingPts+'" fill="none" stroke="#22D3EE" stroke-width="2"/>' +
+      '<polyline points="'+outgoingPts+'" fill="none" stroke="#34D399" stroke-width="2"/>';
+  }
+
+  function tick(){
+    tCounter++;
+    var base = 220 + Math.sin(tCounter/4)*30 + (Math.random()*20-10);
+    var incoming = Math.max(40, Math.round(base*0.55 + intensity*0.65));
+    var outgoing = Math.max(30, Math.round(base*0.45 + intensity*0.15));
+    var pps = Math.max(2000, Math.round(base*45 + intensity*180));
+    traffic.push({t:tCounter, incoming:incoming, outgoing:outgoing, pps:pps});
+    if(traffic.length>30) traffic.shift();
+    renderChart();
+
+    document.getElementById('statTraffic').innerHTML = (incoming+outgoing)+'<span class="unit">Mbps</span>';
+    document.getElementById('statPps').textContent = pps.toLocaleString();
+    document.getElementById('statConn').textContent = (1200 + Math.round(incoming*2)).toLocaleString();
+    document.getElementById('statDetected').textContent = detected;
+    document.getElementById('statMitigated').textContent = mitigated;
+    document.getElementById('statSuspicious').textContent = suspicious;
+  }
+
+  function renderTable(){
+    var body = document.getElementById('attackTableBody');
+    body.innerHTML = attackLog.slice(0,8).map(function(a){
+      var sevClass = a.severity==='Critical'?'b-critical':a.severity==='Low'?'b-low':'b-critical';
+      var statClass = a.status==='Mitigated'?'b-mitigated':'b-active';
+      return '<tr>' +
+        '<td>'+fmtTime(a.time)+'</td>' +
+        '<td>'+a.ip+'</td>' +
+        '<td>'+a.protocol+'</td>' +
+        '<td style="font-family:inherit">'+a.type+'</td>' +
+        '<td><span class="badge '+sevClass+'">'+a.severity+'</span></td>' +
+        '<td><span class="badge '+statClass+'">'+a.status+'</span></td>' +
+      '</tr>';
+    }).join('');
+  }
+
+  function setStatus(ok){
+    var pill = document.getElementById('statusPill');
+    pill.className = 'status-pill ' + (ok?'ok':'bad');
+    pill.innerHTML = '<span class="dot"></span>' + (ok?'PROTECTED':'UNDER ATTACK');
+  }
+
+  // ---------- FLOW UI ----------
+  var flowArea = document.getElementById('flowArea');
+  var mitigationSteps = ['Threat Identified','Suspicious IP Detected','Traffic Rate Limited','IP Blocked','Attack Mitigated'];
+  var mitigationStepIndex = -1;
+
+  function renderFlow(){
+    if(phase==='IDLE'){
+      flowArea.innerHTML = '<div class="flow-idle"><div class="big">✅</div><div class="t1">Network Nominal</div><div>Click Simulate to run the detection &amp; mitigation demo.</div></div>';
+    } else if(phase==='RAMPING'){
+      flowArea.innerHTML = '<div class="flow-idle"><div class="big">📈</div><div class="t1" style="color:var(--amber)">Traffic ramping up…</div></div>';
+    } else if(phase==='ABNORMAL'){
+      flowArea.innerHTML = '<div class="warn-box">⚠ ABNORMAL TRAFFIC<br/>DETECTED</div>';
+    } else if(phase==='CLASSIFYING' || phase==='ALERTING' || phase==='MITIGATING'){
+      var stepsHtml = '';
+      if(phase==='MITIGATING'){
+        stepsHtml = '<div class="steps">' + mitigationSteps.map(function(s,i){
+          var done = i<=mitigationStepIndex;
+          return '<div class="step '+(done?'done':'')+'"><span class="mark">'+(done?'✓':'')+'</span>'+s+'</div>';
+        }).join('') + '</div>';
+      }
+      flowArea.innerHTML =
+        '<div class="attack-meta">' +
+          '<div class="t">DDoS Attack Detected</div>' +
+          '<div class="row"><span>Source IP</span><span>192.168.1.105</span></div>' +
+          '<div class="row"><span>Protocol</span><span>TCP</span></div>' +
+          '<div class="row"><span>Packets/sec</span><span>85,000</span></div>' +
+          '<div class="row"><span>Increase</span><span>740%</span></div>' +
+          (phase!=='CLASSIFYING' ? '<div class="classified">Classified: SYN FLOOD</div>' : '') +
+        '</div>' + stepsHtml;
+    } else if(phase==='RECOVERING'){
+      flowArea.innerHTML = '<div class="flow-idle"><div class="big">🛡️</div><div class="t1" style="color:var(--mint)">Attack Mitigated</div><div>Traffic returning to normal…</div></div>';
+    }
+  }
+
+  var simBtn = document.getElementById('simulateBtn');
+  simBtn.addEventListener('click', function(){
+    if(phase!=='IDLE') return;
+    simBtn.disabled = true;
+    simBtn.textContent = 'Simulation Running…';
+    phase='RAMPING'; renderFlow();
+
+    var rampInt = setInterval(function(){
+      intensity += 140;
+      if(intensity>=700) clearInterval(rampInt);
+    },400);
+
+    setTimeout(function(){ phase='ABNORMAL'; renderFlow(); }, 1800);
+
+    setTimeout(function(){ phase='CLASSIFYING'; renderFlow(); }, 3200);
+
+    setTimeout(function(){
+      phase='ALERTING'; setStatus(false); renderFlow();
+      suspicious++;
+      detected++;
+      attackLog.unshift({
+        time:new Date(), ip:'192.168.1.105', protocol:'TCP',
+        type:'SYN Flood', severity:'Critical', status:'Active'
+      });
+      renderTable();
+    }, 4400);
+
+    setTimeout(function(){
+      phase='MITIGATING'; mitigationStepIndex=0; renderFlow();
+      var step=0;
+      var stepInt = setInterval(function(){
+        step++;
+        if(step>=mitigationSteps.length){ clearInterval(stepInt); return; }
+        mitigationStepIndex=step; renderFlow();
+      },750);
+    }, 5600);
+
+    setTimeout(function(){
+      phase='RECOVERING'; setStatus(true); renderFlow();
+      mitigated++;
+      if(attackLog[0] && attackLog[0].status==='Active'){ attackLog[0].status='Mitigated'; }
+      renderTable();
+      var decayInt = setInterval(function(){
+        intensity -= 140;
+        if(intensity<=0){
+          intensity=0; clearInterval(decayInt);
+          setTimeout(function(){
+            phase='IDLE'; renderFlow();
+            simBtn.disabled=false; simBtn.textContent='⚡ Simulate DDoS Attack';
+          }, 800);
+        }
+      },400);
+    }, 9500);
+  });
+
+  // ---------- START ----------
+  function startApp(){
+    if(appStarted) return;
+    appStarted = true;
+    renderFlow();
+    renderTable();
+    setStatus(true);
+    tick();
+    setInterval(tick, 1500);
+  }
+})();
+</script>
+</body>
+</html>
