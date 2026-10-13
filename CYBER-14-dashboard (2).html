@@ -19,6 +19,8 @@
   .hidden{display:none !important;}
 
   /* ---- Login ---- */
+
+  /* why should only the admin have the login , how it will be if we segment the logins based on roles with authorization and authentication */
   #login{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;}
   .login-box{width:100%;max-width:340px;}
   .logo{width:56px;height:56px;border-radius:12px;background:rgba(34,211,238,.1);border:1px solid rgba(34,211,238,.3);
@@ -387,7 +389,7 @@
       },400);
     }, 9500);
   });
-
+  //text
   // ---------- START ----------
   function startApp(){
     if(appStarted) return;
